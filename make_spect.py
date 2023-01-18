@@ -5,8 +5,6 @@ import soundfile as sf
 from scipy import signal
 from scipy.signal import get_window
 from librosa.filters import mel
-from numpy.random import RandomState
-
 
 def butter_highpass(cutoff, fs, order=5):
     nyq = 0.5 * fs
@@ -35,10 +33,7 @@ mel_basis = mel(16000, 1024, fmin=90, fmax=7600, n_mels=80).T
 min_level = np.exp(-100 / 20 * np.log(10))
 b, a = butter_highpass(30, 16000, order=5)
 
-
-# audio file directory
 rootDir = '/data/hypark/VC/vcc/AUTO-VC2/autovc/mine/LibriSpeech/test'
-# spectrogram directory
 targetDir = '/data/hypark/VC/vcc/AUTO-VC2/autovc/mine/LibriSpeech/test_spec'
 
 
@@ -52,24 +47,13 @@ for subdir in sorted(subdirList):
     if not os.path.exists(os.path.join(targetDir, subdir)):
         os.makedirs(os.path.join(targetDir, subdir))
     _,_, fileList = next(os.walk(os.path.join(dirName,subdir)))
-    #prng = RandomState(int(subdir[1:])) 
     for fileName in sorted(fileList):
-        # Read audio file
-        try:
-            x, fs = sf.read(os.path.join(dirName,subdir,fileName))
-            # Remove drifting noise
-            y = signal.filtfilt(b, a, x)
-            # Ddd a little random noise for model roubstness
-            # wav = y * 0.96 + (prng.rand(y.shape[0])-0.5)*1e-06
-            # Compute spect
-            D = pySTFT(y).T
-            # Convert to mel and normalize
-            D_mel = np.dot(D, mel_basis)
-            D_db = 20 * np.log10(np.maximum(min_level, D_mel)) - 16
-            S = np.clip((D_db + 100) / 100, 0, 1)    
-            # save spect    
-            np.save(os.path.join(targetDir, subdir, fileName[:-4]),
-                    S.astype(np.float32), allow_pickle=False)  
-        except:
-            pass
+        x, fs = sf.read(os.path.join(dirName,subdir,fileName))
+        y = signal.filtfilt(b, a, x)
+        D = pySTFT(y).T
+        D_mel = np.dot(D, mel_basis)
+        D_db = 20 * np.log10(np.maximum(min_level, D_mel)) - 16
+        S = np.clip((D_db + 100) / 100, 0, 1)      
+        np.save(os.path.join(targetDir, subdir, fileName[:-4]),
+                S.astype(np.float32), allow_pickle=False)  
 
