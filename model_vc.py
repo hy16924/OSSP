@@ -180,27 +180,6 @@ class Postnet(nn.Module):
 
         return x    
     
-class Classifier(nn.Module):
-    def __init__(self, dim_neck):
-        super(Classifier, self).__init__()
-        self.fc1 = nn.Linear(dim_neck*2, 2048)
-        self.fc2 = nn.Linear(2048, 1024)
-        self.fc3 = nn.Linear(1024, 40)
-        self.relu = nn.ReLU()
-        
-    def forward(self, x):
-        # 2, dim*neck*2, 40
-        #print("x:" , x.shape)
-        out = x[:,-1,:]
-        out1 = self.fc1(out)
-        out1 = self.relu(out1)
-        out2 = self.fc2(out1)
-        out2 = self.relu(out2)
-        out3 = self.fc3(out2)
-        #print("out:", out.shape)
-        return out3
-
-    
 class Generator(nn.Module):
     """Generator network."""
     def __init__(self, dim_neck, dim_emb, dim_pre, freq):
@@ -209,13 +188,9 @@ class Generator(nn.Module):
         self.encoder = Encoder(dim_neck, dim_emb, freq)
         self.decoder = Decoder(dim_neck, dim_emb, dim_pre)
         self.postnet = Postnet()
-        self.classifier = Classifier(dim_neck)
 
     def forward(self, x, c_org, c_trg):
-        
-        # print("x", x.shape)
-        # print("c_org", c_org.shape)    
-        # print("x: ", x.shape) # (2, 128, 80) and (2, 1, 128, 80)
+       
         codes, outputs = self.encoder(x, c_org)
         # print(len(codes)) # 8 dim_neck 16 기준
         if c_trg is None: # x shape (2, 1, 128, 80)
@@ -226,26 +201,13 @@ class Generator(nn.Module):
         for code in codes: # x.shape: (2, 128, 80)
             # print("code.shape: ", code.shape) # dim_neck : 250, code.shape: [2, 500]
             tmp.append(code.unsqueeze(1).expand(-1,int(x.size(1)/len(codes)),-1))
-            # print("x.size(1): ", int(x.size(1))) # 128
-            # print("len(codes): ", len(codes)) # 8
-            # print("code.unsqueeze: ", code.unsqueeze(1).shape) # [2, 1, 500]
-            # print(code.unsqueeze(1).expand(-1, int(x.size(1)/len(codes)), -1).shape) # torch.size([2, 16, 500])
-            # expand -1 means not changing the size of the dimension 
-                
-            # print("tmp: ", tmp.shape)
-            # print("code.shape: ", code.unsqueeze(1).expand(-1,int(x.size(1)/len(codes)),-1))
+
         code_exp = torch.cat(tmp, dim=1) # torch.size(2, 128, 500) [2, 16, 500]이 8개
-        # print(code_exp.shape) #
-        # print(code_exp.shape)
         encoder_outputs = torch.cat((code_exp, c_trg.unsqueeze(1).expand(-1,x.size(1),-1)), dim=-1)
         
-        # print("encoder_outputs.shape: ", encoder_outputs.shape)
         mel_outputs = self.decoder(encoder_outputs)
                 
         mel_outputs_postnet = self.postnet(mel_outputs.transpose(2,1))
         mel_outputs_postnet = mel_outputs + mel_outputs_postnet.transpose(2,1)
-        
-        mel_outputs = mel_outputs.unsqueeze(1)
-        mel_outputs_postnet = mel_outputs_postnet.unsqueeze(1)
         
         return mel_outputs, mel_outputs_postnet, torch.cat(codes, dim=-1), outputs
