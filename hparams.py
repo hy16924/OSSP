@@ -60,7 +60,7 @@ hparams = Map({
 	'quantize_channels': 65536,  # 65536 or 256
 
 	# Audio:
-	'sample_rate': 16000,
+	'sample_rate': 22050,
 	# this is only valid for mulaw is True
 	'silence_threshold': 2,
 	'num_mels': 80,
