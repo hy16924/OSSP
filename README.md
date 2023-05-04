@@ -9,20 +9,22 @@ The audio demo for Perturbation AUTOVC can be found...
 ### Dependencies
 - Python3
 - Numpy
-- PyTorch...
+- PyTorch
 - librosa
 - tqdm
-- parselmouth
+- parselmouth `pip install praat-parselmouth`
 - torchaudio
 - omegaconf
 - HiFi-GAN vocoder
 - ECAPA-TDNN
   
- ### Pre-traied HiFi-GAN
+ ## Pre-trained models
+
+ You can also use pretrained models we provide.
  
- Download pretrained hifi-gan config and checkpoint from [HiFi-GAN](http://github.com/jik876/hifi-gan)
+ [Download pretrained models](https://drive.google.com/drive/folders/1N3Uo4nM8vtWBqNmoYsqTlRxayM-3owbU?usp=sharing)
  
- Place checkpoint at `./checkpoint` and config at `./configs`
+ Place pre-trained models at `./checkpoint`
  
  
  ### Speaker Encoder
@@ -30,16 +32,16 @@ The audio demo for Perturbation AUTOVC can be found...
  We use the ECAPA-TDNN as a speaker encoder.
  
  For more information, please refer to [ECAPA-TDNN](https://github.com/taoruijie/ecapa-tdnn)
+ 
+ ### Vocoder
+ 
+ We use the HiFi-GAN as a vocoder.
+ 
+ Download pretrained HiFi-GAN config and checkpoint at `pretrained/UNIVERSAL_V1` from [HiFi-GAN](http://github.com/jik876/hifi-gan)
+ 
+ Place checkpoint at `./checkpoint` and config at `./configs`
   
- ### Pre-trained models
- 
- Place pre-trained models at `./checkpoint`
- 
- | Perturbation AUTOVC | Speaker Encoder |
- |---------------------|-----------------|
- | [link](https://drive.google.com/drive/folders/1N3Uo4nM8vtWBqNmoYsqTlRxayM-3owbU?usp=sharing)) |
- 
- ### Datasets
+ ## Datasets
  
  Datasets used when training are:
  - VCTK:
@@ -48,7 +50,7 @@ The audio demo for Perturbation AUTOVC can be found...
 
  Place datasets at `datasets/wavs/`
  
- ### 1. Preprocess dataset.
+ ## 1. Preprocess dataset.
  
  If you prefer `praat-parselmouth`, run `python make_metadata.py`
  
@@ -68,7 +70,7 @@ make_data(wav_dir, real_dir, perturb_dir)
 
 When this is done, `metadata.pkl` is created at `--save_path`.
  
- ### 2. Training
+ ## 2. Training
  
 Prefer `metadata.pkl`, including the speaker embedding, output of ECAPA-TDNN.
 
@@ -100,7 +102,7 @@ parser.add_argument('--log_step', type=int, default=10000)
 
 Converges when the reconstruction loss is around 0.01.
 
- ### 3. Inference
+ ## 3. Inference
  
  Run the `python conversion.py --source_path={} --target_path={}`
  
