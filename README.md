@@ -1,6 +1,6 @@
 ## Perturbation AUTOVC: Voice Conversion from Perturbation and Autoencoder Loss
 
-This repository provides a PyTorch implementation of Perturbation AUTOVC.
+We provide our implementation and pretrained models as open source in this repository.
 
 ### Audio Demo
 
