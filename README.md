@@ -37,7 +37,7 @@ The audio demo for Perturbation AUTOVC can be found...
  
  | Perturbation AUTOVC | Speaker Encoder |
  |---------------------|-----------------|
- | [link](https://drive.google.com/file/) |
+ | [link](https://drive.google.com/drive/folders/1N3Uo4nM8vtWBqNmoYsqTlRxayM-3owbU?usp=sharing)) |
  
  ### Datasets
  
